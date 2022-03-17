@@ -35,14 +35,14 @@ const middleware = [
 
 middleware.forEach((it) => server.use(it))
 
-server.get('/api/v1/users', async (req, res) => {  
+server.get('/api/v1/users', async (req, res) => {
   const { data: users } = await axios('https://jsonplaceholder.typicode.com/users')
-  res.json(users)  
+  res.json(users)
 })
 
-server.get('/api/v1/users/:name', (req, res) => {  
-  const { name } = req.params  
-  res.json({ name })  
+server.get('/api/v1/users/:name', (req, res) => {
+  const { name } = req.params
+  res.json({ name })
 })
 
 server.use('/api/', (req, res) => {
