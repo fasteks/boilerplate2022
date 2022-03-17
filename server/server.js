@@ -4,6 +4,7 @@ import cors from 'cors'
 import sockjs from 'sockjs'
 import { renderToStaticNodeStream } from 'react-dom/server'
 import React from 'react'
+import axios from 'axios'
 
 import cookieParser from 'cookie-parser'
 import config from './config'
@@ -33,6 +34,16 @@ const middleware = [
 ]
 
 middleware.forEach((it) => server.use(it))
+
+server.get('/api/v1/users', async (req, res) => {  
+  const { data: users } = await axios('https://jsonplaceholder.typicode.com/users')
+  res.json(users)  
+})
+
+server.get('/api/v1/users/:name', (req, res) => {  
+  const { name } = req.params  
+  res.json({ name })  
+})
 
 server.use('/api/', (req, res) => {
   res.status(404)
