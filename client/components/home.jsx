@@ -14,7 +14,7 @@ const Home = () => {
         updateCounter
       </button>
       <div> Hello World Dashboard {counter} </div>
-      <Link to='/' >Go To Dummy</Link>
+      <Link to="/">Go To Dummy</Link>
     </div>
   )
 }

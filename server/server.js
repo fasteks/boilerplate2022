@@ -81,7 +81,7 @@ if (config.isSocketsEnabled) {
   const echo = sockjs.createServer()
   echo.on('connection', (conn) => {
     connections.push(conn)
-    conn.on('data', async () => { })
+    conn.on('data', async () => {})
 
     conn.on('close', () => {
       connections = connections.filter((c) => c.readyState !== 3)
