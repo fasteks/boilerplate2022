@@ -10,6 +10,8 @@ import cookieParser from 'cookie-parser'
 import config from './config'
 import Html from '../client/html'
 
+const { readFile, writeFile, stat } = require('fs').promises
+
 require('colors')
 
 let Root
@@ -25,19 +27,35 @@ let connections = []
 const port = process.env.PORT || 8090
 const server = express()
 
+const setHeaders = function (req, res, next) {
+  res.set('x-skillcrucial-user', '71cfff71-34e1-46eb-95ad-29637d913771')
+  res.set('Access-Control-Expose-Headers', 'X-SKILLCRUCIAL-USER')
+  next()
+}
+
 const middleware = [
   cors(),
   express.static(path.resolve(__dirname, '../dist/assets')),
   express.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }),
   express.json({ limit: '50mb', extended: true }),
-  cookieParser()
+  cookieParser(),
+  setHeaders
 ]
 
 middleware.forEach((it) => server.use(it))
 
 server.get('/api/v1/users', async (req, res) => {
-  const { data: users } = await axios('https://jsonplaceholder.typicode.com/users')
-  res.json(users)
+  stat(`${__dirname}/users.json`)
+    .then(() => {
+      readFile(`${__dirname}/users.json`, { encoding: 'utf8' }).then((users) => {
+        res.json(JSON.parse(users))
+      })
+    })
+    .catch(async () => {
+      const { data: users } = await axios('https://jsonplaceholder.typicode.com/users')
+      writeFile(`${__dirname}/users.json`, JSON.stringify(users), { encoding: 'utf8' })
+      res.json(users)
+    })
 })
 
 server.get('/api/v1/users/:name', (req, res) => {
