@@ -10,7 +10,7 @@ import cookieParser from 'cookie-parser'
 import config from './config'
 import Html from '../client/html'
 
-const { readFile, writeFile, stat } = require('fs').promises
+const { readFile, writeFile } = require('fs').promises
 
 require('colors')
 
@@ -44,18 +44,35 @@ const middleware = [
 
 middleware.forEach((it) => server.use(it))
 
-server.get('/api/v1/users', async (req, res) => {
-  stat(`${__dirname}/users.json`)
-    .then(() => {
-      readFile(`${__dirname}/users.json`, { encoding: 'utf8' }).then((users) => {
-        res.json(JSON.parse(users))
-      })
+const getData = () => {
+  return readFile(`${__dirname}/users.json`, { encoding: 'utf8' })
+    .then((users) => {
+      return JSON.parse(users)
     })
     .catch(async () => {
       const { data: users } = await axios('https://jsonplaceholder.typicode.com/users')
-      writeFile(`${__dirname}/users.json`, JSON.stringify(users), { encoding: 'utf8' })
-      res.json(users)
+      await writeFile(`${__dirname}/users.json`, JSON.stringify(users), { encoding: 'utf8' })
+      return users
     })
+}
+
+const writeData = (file) => {
+  return writeFile(`${__dirname}/users.json`, JSON.stringify(file), { encoding: 'utf8' })
+}
+
+server.get('/api/v1/users', async (req, res) => {
+  const users = await getData()
+  res.json(users)
+})
+
+server.post('/api/v1/users', async (req, res) => {
+  let users = await getData()
+  // arrayLastItemId = users.filter(it => index === users.length - 1).map(it => it.id)
+  const lastItemId = users.length + 1
+  const lastItem = { ...req.body, id: lastItemId }
+  users = [...users, lastItem]
+  await writeData(users)
+  res.json({ status: 'success', id: lastItemId })
 })
 
 server.get('/api/v1/users/:name', (req, res) => {
