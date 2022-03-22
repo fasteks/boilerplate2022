@@ -66,18 +66,20 @@ server.get('/api/v1/users', async (req, res) => {
 })
 
 server.post('/api/v1/users', async (req, res) => {
-  let users = await getData()
-  // arrayLastItemId = users.filter(it => index === users.length - 1).map(it => it.id)
+  const users = await getData()
   const lastItemId = users.length + 1
   const lastItem = { ...req.body, id: lastItemId }
-  users = [...users, lastItem]
-  await writeData(users)
+  const usersUpdate = [...users, lastItem]
+  await writeData(usersUpdate)
   res.json({ status: 'success', id: lastItemId })
 })
 
-server.get('/api/v1/users/:name', (req, res) => {
-  const { name } = req.params
-  res.json({ name })
+server.patch('/api/v1/users/:userId', async (req, res) => {
+  const users = await getData()
+  const { userId } = req.params
+  const usersUpdate = users.map((it) => (it.id === +userId ? { ...it, ...req.body } : it))
+  await writeData(usersUpdate)
+  res.json({ status: 'success', id: userId })
 })
 
 server.use('/api/', (req, res) => {
