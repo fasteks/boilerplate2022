@@ -67,7 +67,10 @@ server.get('/api/v1/users', async (req, res) => {
 
 server.post('/api/v1/users', async (req, res) => {
   const users = await getData()
-  const lastItemId = users.length + 1
+  const regexp = /\d/g
+  const idList = users.map((it) => +it.id).filter((it) => regexp.test(it))
+  const maxId = Math.max(...idList)
+  const lastItemId = maxId + 1
   const lastItem = { ...req.body, id: lastItemId }
   const usersUpdate = [...users, lastItem]
   await writeData(usersUpdate)
