@@ -10,7 +10,7 @@ import cookieParser from 'cookie-parser'
 import config from './config'
 import Html from '../client/html'
 
-const { readFile, writeFile } = require('fs').promises
+const { readFile, writeFile, unlink } = require('fs').promises
 
 require('colors')
 
@@ -83,6 +83,11 @@ server.patch('/api/v1/users/:userId', async (req, res) => {
   const usersUpdate = users.map((it) => (it.id === +userId ? { ...it, ...req.body } : it))
   await writeData(usersUpdate)
   res.json({ status: 'success', id: userId })
+})
+
+server.delete('/api/v1/users/', async (req, res) => {
+  await unlink(`${__dirname}/users.json`)
+  res.json({ status: 'success', description: `Deleted users.json` })
 })
 
 server.use('/api/', (req, res) => {
