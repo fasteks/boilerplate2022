@@ -77,6 +77,9 @@ server.post('/api/v1/users', async (req, res) => {
 server.patch('/api/v1/users/:userId', async (req, res) => {
   const users = await getData()
   const { userId } = req.params
+  if (users.filter((it) => it.id === +userId).length === 0) {
+    res.json({ status: 'Not Found', description: `There is not such id as ${userId}` })
+  }
   const usersUpdate = users.map((it) => (it.id === +userId ? { ...it, ...req.body } : it))
   await writeData(usersUpdate)
   res.json({ status: 'success', id: userId })
