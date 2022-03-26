@@ -26,7 +26,8 @@
         "heroku-postbuild": "yarn run build:prod && yarn run build:ssr",
         "storybook": "start-storybook -p 6006",
         "build-storybook": "build-storybook",
-        "prepare": "husky install"
+        "prepare": "husky install",
+        "debug": "nodemon --inspect start.js"
     },
     "author": "",
     "license": "MIT",
